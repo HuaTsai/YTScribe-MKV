@@ -51,6 +51,14 @@ def parse_args() -> argparse.Namespace:
                    help="faster-whisper model name (default: large-v3)")
     p.add_argument("--out-dir", type=Path, default=None,
                    help="output directory (default: current working dir)")
+    p.add_argument("--cookies-from-browser", metavar="BROWSER[:PROFILE]",
+                   default=None,
+                   help="extract cookies from a local browser "
+                        "(e.g. 'chrome', 'firefox:default'); required for "
+                        "channel-membership-only videos")
+    p.add_argument("--cookies", type=Path, default=None, metavar="FILE",
+                   help="path to a Netscape-format cookies.txt file "
+                        "(alternative to --cookies-from-browser)")
     return p.parse_args()
 
 
@@ -58,7 +66,9 @@ def main() -> None:
     args = parse_args()
     preflight()
 
-    info = download.fetch(args.url, mode=args.mode, out_dir=args.out_dir)
+    info = download.fetch(args.url, mode=args.mode, out_dir=args.out_dir,
+                           cookies_from_browser=args.cookies_from_browser,
+                           cookies_file=args.cookies)
 
     base_dir = (args.out_dir or Path.cwd()).resolve()
     stem = Path(info["media_path"]).stem

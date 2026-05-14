@@ -59,7 +59,9 @@ def _extract_audio(media: Path) -> Path:
 
 
 def fetch(url: str, mode: Literal["audio", "video"] = "audio",
-          out_dir: Path | None = None) -> DownloadResult:
+          out_dir: Path | None = None,
+          cookies_from_browser: str | None = None,
+          cookies_file: Path | None = None) -> DownloadResult:
     out_dir = (out_dir or Path.cwd()).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -72,6 +74,13 @@ def fetch(url: str, mode: Literal["audio", "video"] = "audio",
         "restrictfilenames": False,
         "windowsfilenames": False,
     }
+
+    if cookies_from_browser:
+        # Format: "chrome", "firefox:default", "brave:Profile 1"
+        browser, _, profile = cookies_from_browser.partition(":")
+        common["cookiesfrombrowser"] = (browser, profile or None, None, None)
+    if cookies_file:
+        common["cookiefile"] = str(cookies_file)
 
     if mode == "audio":
         opts = {
