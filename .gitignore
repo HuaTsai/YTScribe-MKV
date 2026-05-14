@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# uv
+.uv/
+
+# Build/run outputs
+*.opus
+*.mp4
+*.webm
+*.mkv
+*.srt
+*.png
+*.webp
+*.jpg
+*.jpeg
+
+# Editor
+.vscode/
+.idea/

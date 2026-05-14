@@ -1,0 +1,12 @@
+[project]
+name = "ytscribe-mkv"
+version = "0.1.0"
+description = "YouTube → faster-whisper → Claude translation → MKV pipeline."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "yt-dlp>=2026.3.17",
+    "faster-whisper>=1.0",
+    "nvidia-cublas-cu12",
+    "nvidia-cudnn-cu12",
+]
