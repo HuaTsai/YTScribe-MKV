@@ -1,11 +1,26 @@
 """yt-dlp wrapper. Returns a dict describing what was downloaded."""
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 from typing import Literal, TypedDict
 
 import yt_dlp
+
+
+def _detect_js_runtime() -> dict | None:
+    """Pick the first available JS runtime for yt-dlp's n-challenge solver.
+
+    YouTube obfuscates download URLs via a JS challenge; yt-dlp needs a
+    runtime (deno/node/bun) to execute the solver script. Without this,
+    only image-format stubs are available and audio/video fails with
+    'Requested format is not available'.
+    """
+    for name in ("deno", "node", "bun"):
+        if shutil.which(name):
+            return {name: {}}
+    return None
 
 
 class DownloadResult(TypedDict):
@@ -74,6 +89,17 @@ def fetch(url: str, mode: Literal["audio", "video"] = "audio",
         "restrictfilenames": False,
         "windowsfilenames": False,
     }
+
+    runtime = _detect_js_runtime()
+    if runtime:
+        common["js_runtimes"] = runtime
+        # Allow yt-dlp to fetch the n-challenge solver from yt-dlp-ejs on
+        # GitHub. Required alongside js_runtimes for current YouTube.
+        common["remote_components"] = {"ejs:github"}
+    else:
+        print("[download] warning: no JS runtime (deno/node/bun) found on "
+              "PATH; YouTube downloads will likely fail with 'Requested "
+              "format is not available'", file=sys.stderr)
 
     if cookies_from_browser:
         # Format: "chrome", "firefox:default", "brave:Profile 1"
