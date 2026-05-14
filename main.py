@@ -59,6 +59,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--cookies", type=Path, default=None, metavar="FILE",
                    help="path to a Netscape-format cookies.txt file "
                         "(alternative to --cookies-from-browser)")
+    p.add_argument("--name", default=None, metavar="STEM",
+                   help="output filename without extension "
+                        "(default: derived from YouTube title)")
     return p.parse_args()
 
 
@@ -74,7 +77,7 @@ def main() -> None:
     stem = Path(info["media_path"]).stem
     ja_srt = base_dir / f"{stem}.ja.srt"
     zh_srt = base_dir / f"{stem}.zh.srt"
-    out_mkv = base_dir / f"{stem}.mkv"
+    out_mkv = base_dir / f"{args.name or stem}.mkv"
 
     raw_segs = transcribe.run(Path(info["audio_path"]),
                               model_name=args.model)
